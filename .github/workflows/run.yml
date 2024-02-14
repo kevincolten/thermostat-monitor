@@ -29,3 +29,4 @@ jobs:
         GOOGLE_DEVICE_PROJECT_ID: ${{ secrets.GOOGLE_DEVICE_PROJECT_ID }}
         GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
         GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+        GH_API_KEY: ${{ secrets.GH_API_KEY }}

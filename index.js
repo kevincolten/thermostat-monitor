@@ -46,5 +46,5 @@ const {
 
   writeFileSync('./data/data.csv', unparse([...data, ...newData]), 'utf-8');
 
-  execSync(`git config --local user.email "action@github.com" && git config --local user.name "GitHub Action" && npx gh-pages --dist data`);
+  execSync(`git config --local user.email "action@github.com" && git config --local user.name "GitHub Action" && npx gh-pages --repo https://git:${process.env.GH_API_KEY}@github.com/kevincolten/thermostat-monitor.git --dist data`);
 })();

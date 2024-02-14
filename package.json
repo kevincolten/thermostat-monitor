@@ -9,7 +9,6 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "gh-pages": "^6.0.0",
     "googleapis": "^133.0.0",
     "luxon": "^3.4.4",
     "papaparse": "^5.4.1"

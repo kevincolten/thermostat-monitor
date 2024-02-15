@@ -27,12 +27,14 @@ const {
     },
   })).json();
 
+  const timestamp = DateTime.local().setZone("America/Chicago").toISO();
+
   const newData = devices.map(device => ({
     location: ['Lockers', 'Theater'].includes(device.parentRelations?.[0]?.displayName) ? 'West 5th' : 'East Austin',
     name: device.parentRelations?.[0]?.displayName || '',
     humidity: device.traits?.['sdm.devices.traits.Humidity']?.ambientHumidityPercent || '',
     temperature: device.traits?.['sdm.devices.traits.Temperature']?.ambientTemperatureCelsius || '',
-    timestamp: DateTime.local().setZone("America/Chicago").toISO(),
+    timestamp,
     connectivity: device.traits?.['sdm.devices.traits.Connectivity']?.status || '',
     fan_timer: device.traits?.['sdm.devices.traits.Fan']?.timerMode || '',
     fan_timer_duration: device.traits?.['sdm.devices.traits.Fan']?.timerTimeout || '',
@@ -44,7 +46,7 @@ const {
     temperature: Math.round(device.traits?.['sdm.devices.traits.Temperature']?.ambientTemperatureCelsius * 1.8 + 32) || '',
   }));
 
-  writeFileSync('./data/data.csv', unparse([...data, ...newData]), 'utf-8');
+  writeFileSync('./data/data.csv', unparse([...data, ...newData].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))), 'utf-8');
 
   execSync(`git config --local user.email "action@github.com" && git config --local user.name "GitHub Action" && npx gh-pages --repo https://git:${process.env.GH_API_KEY}@github.com/kevincolten/thermostat-monitor.git --dist data`);
 })();

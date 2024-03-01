@@ -2,6 +2,7 @@ const { parse, unparse } = require('papaparse');
 const { writeFileSync } = require('fs');
 const { DateTime } = require('luxon');
 const { execSync } = require('child_process');
+const { groupBy, forEach } = require('lodash');
 const {
   GOOGLE_API_REFRESH_TOKEN,
   GOOGLE_DEVICE_PROJECT_ID,
@@ -46,7 +47,13 @@ const {
     temperature: Math.round(device.traits?.['sdm.devices.traits.Temperature']?.ambientTemperatureCelsius * 1.8 + 32) || '',
   }));
 
-  writeFileSync('./data/data.csv', unparse([...data, ...newData].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))), 'utf-8');
+  const csvData = [...data, ...newData].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
+
+  writeFileSync('./data/data.csv', unparse(csvData), 'utf-8');
+
+  const csvGroupedByDay = groupBy(csvData, row => DateTime.fromISO(row.timestamp).setZone('America/Chicago').toFormat('yyyy-MM-dd'));
+
+  forEach(csvGroupedByDay, (rows, date) => writeFileSync(`./data/${date}.csv`, unparse(rows), 'utf-8'));
 
   execSync(`git config --local user.email "action@github.com" && git config --local user.name "GitHub Action" && npx gh-pages --repo https://git:${process.env.GH_API_KEY}@github.com/kevincolten/thermostat-monitor.git --dist data`);
 })();

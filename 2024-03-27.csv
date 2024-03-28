@@ -1,4 +1,6 @@
 location,name,humidity,temperature,timestamp,connectivity,fan_timer,fan_timer_duration,mode,eco,status,coolSet,heatSet
+West 5th,Lockers,67,70,2024-03-27T22:20:49.098-05:00,ONLINE,OFF,,COOL,OFF,OFF,74,
+West 5th,Theater,64,73,2024-03-27T22:20:49.098-05:00,ONLINE,OFF,,COOL,OFF,COOLING,72,
 West 5th,Lockers,68,70,2024-03-27T22:03:38.653-05:00,ONLINE,OFF,,COOL,OFF,OFF,74,
 West 5th,Theater,64,73,2024-03-27T22:03:38.653-05:00,ONLINE,OFF,,COOL,OFF,COOLING,72,
 West 5th,Lockers,67,70,2024-03-27T21:47:18.271-05:00,ONLINE,OFF,,COOL,OFF,OFF,74,

@@ -30,7 +30,7 @@ const {
       },
     })).json());
   } catch (e) {
-    await sendMessage({ message: `Error fetching thermostat data: ${e.message}`, channel: '#cyclebar' });
+    await sendMessage({ message: `Error fetching thermostat data: ${e.message}` });
     throw e;
   }
 
@@ -68,7 +68,7 @@ const {
   });
 
   if (message) {
-    await sendMessage({ message, channel: '#cyclebar' });
+    await sendMessage({ message });
   }
 
   const csvGroupedByDay = groupBy(csvData, row => DateTime.fromISO(row.timestamp).setZone('America/Chicago').toFormat('yyyy-MM-dd'));

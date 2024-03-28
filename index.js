@@ -3,6 +3,7 @@ const { writeFileSync } = require('fs');
 const { DateTime } = require('luxon');
 const { execSync } = require('child_process');
 const { groupBy, forEach } = require('lodash');
+const { sendMessage } = require('./services/slack');
 const {
   GOOGLE_API_REFRESH_TOKEN,
   GOOGLE_DEVICE_PROJECT_ID,
@@ -16,17 +17,22 @@ const {
     header: true,
     delimiter: ','
   });
+  let devices;
+  try {
+    const { access_token } = await (await fetch(`https://www.googleapis.com/oauth2/v4/token?client_id=${GOOGLE_CLIENT_ID}&client_secret=${GOOGLE_CLIENT_SECRET}&refresh_token=${GOOGLE_API_REFRESH_TOKEN}&grant_type=refresh_token`, {
+      method: 'POST',
+    })).json();
 
-  const { access_token } = await (await fetch(`https://www.googleapis.com/oauth2/v4/token?client_id=${GOOGLE_CLIENT_ID}&client_secret=${GOOGLE_CLIENT_SECRET}&refresh_token=${GOOGLE_API_REFRESH_TOKEN}&grant_type=refresh_token`, {
-    method: 'POST',
-  })).json();
-
-  const { devices } = await (await fetch(`https://smartdevicemanagement.googleapis.com/v1/enterprises/${GOOGLE_DEVICE_PROJECT_ID}/devices/`, {
-    headers: {
-      'Authorization': `Bearer ${access_token}`,
-      'Content-Type': 'application/json',
-    },
-  })).json();
+    ({ devices } = await (await fetch(`https://smartdevicemanagement.googleapis.com/v1/enterprises/${GOOGLE_DEVICE_PROJECT_ID}/devices/`, {
+      headers: {
+        'Authorization': `Bearer ${access_token}`,
+        'Content-Type': 'application/json',
+      },
+    })).json());
+  } catch (e) {
+    await sendMessage({ message: `Error fetching thermostat data: ${e.message}`, channel: '#cyclebar' });
+    throw e;
+  }
 
   const timestamp = DateTime.local().setZone("America/Chicago").toISO();
 
@@ -50,6 +56,20 @@ const {
   const csvData = [...data, ...newData].sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
 
   writeFileSync('./data/data.csv', unparse(csvData), 'utf-8');
+
+  const csvGroupedByDevice = groupBy(csvData, 'name');
+
+  let message = '';
+
+  forEach(csvGroupedByDevice, (rows, device) => {
+    if (rows.slice(0, 5).every(row => row.status === 'COOLING')) {
+      message += `${device} AC might be frozen over.\n`;
+    }
+  });
+
+  if (message) {
+    await sendMessage({ message, channel: '#cyclebar' });
+  }
 
   const csvGroupedByDay = groupBy(csvData, row => DateTime.fromISO(row.timestamp).setZone('America/Chicago').toFormat('yyyy-MM-dd'));
 

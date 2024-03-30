@@ -62,6 +62,7 @@ const {
   let message = '';
 
   forEach(csvGroupedByDevice, (rows, device) => {
+    console.log(rows.slice(0, 5));
     if (rows.slice(0, 5).every(row => row.status === 'COOLING')) {
       message += `${device} AC might be frozen over.\n`;
     }

@@ -12,7 +12,7 @@ const {
 } = process.env;
 
 (async () => {
-  const oldDataResponse = await (await fetch('https://kevincolten.github.io/thermostat-monitor/data.csv')).text();
+  const oldDataResponse = await (await fetch('https://raw.githack.com/kevincolten/thermostat-monitor/gh-pages/data.csv')).text();
   const { data } = parse(oldDataResponse, {
     header: true,
     delimiter: ','
